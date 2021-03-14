@@ -49,6 +49,8 @@ UART_HandleTypeDef huart2;
 uint32_t ADCData[4] = { 0 };
 uint32_t ButtonTimeStamp = 0;
 float A = 0;
+float B = 0;
+uint32_t LED = 0;
 GPIO_PinState SwitchState[2];
 
 /* USER CODE END PV */
@@ -108,7 +110,13 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-
+		/*if (LED == 1);
+		{
+			if(HAL_GetTick() - ButtonTimeStamp >=  (1000 + ((22695477 * ADCData[0]) + ADCData[1]) % 10000))
+			{
+				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+			}
+		}*/
 	}
 	/* USER CODE END 3 */
 }
@@ -307,17 +315,22 @@ static void MX_GPIO_Init(void) {
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	SwitchState[0] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
-
+	B = HAL_GetTick();
 	if (GPIO_Pin == GPIO_PIN_13) {
-		if (SwitchState[1] == 1 && SwitchState[0] == 0) {
-			ButtonTimeStamp = HAL_GetTick();
-			if (ButtonTimeStamp
-					>= (1000 + ((22695477 * ADCData[0]) + ADCData[1]) % 10000)) {
+		//if (SwitchState[1] == 1 && SwitchState[0] == 0) {
+			if (LED != 1){
+				ButtonTimeStamp = HAL_GetTick();
 				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 			}
-		}
-		else if (SwitchState[1] == 0 && SwitchState[0] == 1) {
+			LED = 1;
+			/*if (ButtonTimeStamp
+					>= (1000 + ((22695477 * ADCData[0]) + ADCData[1]) % 10000)) {
+				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+			}*/
+
+		 if (SwitchState[1] == 0 && SwitchState[0] == 1) {
 			A = HAL_GetTick() - ButtonTimeStamp;
+			LED = 0;
 		}
 		}
 	SwitchState[1] = SwitchState[0];
