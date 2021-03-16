@@ -52,6 +52,8 @@ uint32_t ButtonTimeStamp2 = 0;
 uint32_t release = 0;
 uint32_t TimeCode = 0;
 uint32_t ResponseGame = 0;
+uint32_t ResponseGame1 = 0 ;
+int a = 0;
 int ModeLED = 0;
 GPIO_PinState SwitchState[2];
 
@@ -113,12 +115,14 @@ int main(void) {
 
 		/* USER CODE BEGIN 3 */
 		if (ModeLED == 1) {
-			if ((HAL_GetTick() - ButtonTimeStamp)
-					>= (1000 + ((22695477 * ADCData[0]) + ADCData[1]) % 10000)) {
+			a = HAL_GetTick() - ButtonTimeStamp2;
+			ResponseGame1 = (1000 + ((22695477 * ADCData[0]) + ADCData[1]) % 10000);
+			if ((HAL_GetTick() - ButtonTimeStamp2)
+					> (1000 + ((22695477 * ADCData[0]) + ADCData[1]) % 10000)) {
 				ResponseGame = (1000
 						+ ((22695477 * ADCData[0]) + ADCData[1]) % 10000);
-				ButtonTimeStamp2 = HAL_GetTick();
 				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+				ButtonTimeStamp2 = HAL_GetTick();
 				ModeLED = 2;
 			}
 		}
@@ -328,6 +332,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 			if (ModeLED == 0) {
 				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+				ButtonTimeStamp2 = HAL_GetTick();
 			}
 
 			if (ModeLED == 2) {
